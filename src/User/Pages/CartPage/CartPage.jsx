@@ -13,6 +13,7 @@ import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import {
   clearCart,
+  FetchingCart,
   quantityDecrementAsync,
   quantityIncrementAsync,
   removeFromCartAsync
@@ -31,8 +32,14 @@ export default function CartPage() {
   const user = filteredUsers?.data?.find((user) => user._id === id);
 
   const Subtotal = cart?.reduce((total, product) => {
-    return total + product.productId.price * product.quantity;
+    return total + product.price * product.quantity;
   }, 0);
+  // const Subtotal = cart.total
+useEffect(()=>{
+  dispatch(FetchingCart())
+},[cart])
+  // console.log(cart);
+  
 
   const handleCheckout = async () => {
     try {
@@ -168,7 +175,7 @@ export default function CartPage() {
                                   <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
                                     <img
                                       src={product.img}
-                                      alt={product.productId.imageAlt}
+                                      // alt={product.productId.imageAlt}
                                       className="h-full w-full object-cover object-center"
                                     />
                                   </div>
@@ -177,21 +184,21 @@ export default function CartPage() {
                                     <div>
                                       <div className="flex justify-between text-base font-medium text-gray-900">
                                         <h3>
-                                          <a href={product.productId.href}>
+                                          {/* <a href={product.productId.href}> */}
                                             {product.title}
-                                          </a>
+                                          {/* </a> */}
                                         </h3>
                                         <span className="ml-4">
-                                          {product.productId.price *
-                                            product.quantity}
+                                          {/* {product.price *
+                                            product.quantity} */}
                                         </span>
                                       </div>
                                       <span className=" text-sm text-gray-500">
-                                        {product.productId.color}
+                                        {/* {product.productId.color} */}
                                       </span>
                                       <p className="mt-1 text-xs float-end text-gray-500">
-                                        {product.productId.price} x{" "}
-                                        {product.quantity}
+                                        {/* {product.productId.price} x{" "}
+                                        {product.quantity} */}
                                       </p>
                                     </div>
                                     <div className="flex flex-1 items-end justify-between text-sm">
@@ -199,7 +206,7 @@ export default function CartPage() {
                                         <button
                                           onClick={() => {
                                             dispatch(
-                                              quantityDecrementAsync(product)
+                                              quantityDecrementAsync({product,dispatch,toast})
                                             );
                                           }}
                                           className="px-1 py-.5 bg-indigo-500 text-white font-semibold text-base rounded shadow hover:bg-indigo-600 focus:outline-none  focus:ring-indigo-600"
@@ -210,7 +217,7 @@ export default function CartPage() {
                                         <button
                                           onClick={() => {
                                             dispatch(
-                                              quantityIncrementAsync(product)
+                                              quantityIncrementAsync({product,toast,dispatch})
                                             );
                                           }}
                                           className="px-1 py-.5 bg-indigo-500 text-white font-semibold text-base rounded shadow hover:bg-indigo-600 focus:outline-none  focus:ring-indigo-600"
@@ -223,9 +230,7 @@ export default function CartPage() {
                                         <button
                                           onClick={() => {
                                             dispatch(
-                                              removeFromCartAsync(
-                                                product.productId._id
-                                              )
+                                              removeFromCartAsync({product,dispatch,toast} )
                                             );
                                           }}
                                           type="button"

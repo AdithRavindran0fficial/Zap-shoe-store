@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 // import axios from "axios";
 import api from "../../utils/axios";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 const INITIAL_STATE = {
   cart: [],
@@ -10,7 +11,13 @@ export const FetchingCart = createAsyncThunk(
   "cartSlice/FetchingCart",
   async (_, { rejectWithValue }) => {
     try {
-      const res = await api.get("/Cart/Cart")
+      const res = await axios.get("https://localhost:7211/api/Cart/Cart",{
+        headers:{
+          Authorization:`Bearer ${localStorage.getItem("token")}`
+        }
+      })
+      console.log(`this is from fetching carts ${res.data}`);
+      
       return res.data.data
     } catch (error) {
       console.error("Something went wrong!", error.message);
@@ -21,20 +28,24 @@ export const FetchingCart = createAsyncThunk(
 
 export const addToCartAsync = createAsyncThunk(
   "cartSlice/addToCartAsync",
-  async ({product,toast,dispatch}, { getState }) => {
+  async ({product,toast}, { getState }) => {
     try {   
       // const id = localStorage.getItem("id");
       console.log(`going to post product to cart this from thunk this is id ${product.id}`);
       console.log(localStorage.getItem("token"))
       
-     const res =  await api.post("https://localhost:7211/api/Cart/Addtocart", {
+     const res =  await axios.post("https://localhost:7211/api/Cart/Addtocart", {
         productId:product.id
-      },
+      },{
+        headers:{
+          Authorization:`Bearer ${localStorage.getItem("token")}`
+        }
+      }
     );
   console.log(`${res.data.message} this from addto cart function thunk`);
     if(res.status==200){
       toast.success("Product added Successfully");
-      dispatch(FetchingCart())
+      return res.data.data
     }
    
   }
@@ -46,7 +57,7 @@ export const addToCartAsync = createAsyncThunk(
       toast.error("Item already in cart")     
     }
     if(error.response.status==500){
-      toast.error("Something went wrong")     
+      toast.error("Internal server issue")    
     }
   }
 
@@ -54,86 +65,70 @@ export const addToCartAsync = createAsyncThunk(
 
 export const removeFromCartAsync = createAsyncThunk(
   "cartSlice/removeFromCartAsync",
-  async (productId, { getState }) => {
+  async ({product,dispatch,toast}, { getState }) => {
     try {
-      const id = localStorage.getItem("id");
-
-      const deleteProduct = await api.delete(`/user/${id}/cart`, {
-        data: { productId: productId },
-      });
-      const currentProducts = deleteProduct?.data?.data?.products;
-
-      if (currentProducts.length > 0) {
-        const res = await api.get(`/user/${id}/cart`);
-        if (res?.data?.data?.products) {
-          return res.data.data.products;
-        } else {
-          throw new Error("Cart not found or empty");
+      const resp = await axios.delete(`https://localhost:7211/api/Cart/Remove?productid=${product.id}`,{
+        headers:{
+          Authorization:`Bearer ${localStorage.getItem("token")}`
         }
-      } else {
-        return [];
+        
       }
-    } catch (error) {
+    )
+    if(resp==200){
+      dispatch(FetchingCart())
+    }
+      
+      }
+     catch (error) {
       console.log("something went wrong!");
-      throw error;
+      toast.error("something went wrong")
     }
   }
 );
 
 export const quantityIncrementAsync = createAsyncThunk(
   "cartSlice/quantityIncrementAsync",
-  async (product, { getState }) => {
-    try {
-      // const state = getState();
-      const id = localStorage.getItem("id");
-      // const userCart = Array.isArray(state.cartSlice.cart)
-      //   ? state.cartSlice.cart.map((item) => {
-      //       if (item._id === product._id) {
-      //         return { ...item, quantity: item.quantity + 1 };
-      //       }
-      //       return item;
-      //     })
-      //   : [];
-
-      await api.post(`user/${id}/cart`, {
-        productId: product.productId._id,
-        quantity: product.quantity,
-        action: "increment",
-      });
-      const res = await api.get(`/user/${id}/cart`);
-      return res.data.data.products;
-    } catch (error) {
-      console.log("something went wrong!");
-      throw error;
+  async({product,toast,dispatch})=>{
+    try{
+      const response = await axios.put("https://localhost:7211/api/Cart/increaseqty",{
+        productId : product.id
+      },{
+        headers:{
+          Authorization:`Bearer ${localStorage.getItem("token")}`
+        }
+      }
+    )
+    if(response==200){
+      dispatch(FetchingCart())
     }
+  
+
+    }
+    catch(error){
+      toast("something went wrong")
+    }
+    
   }
 );
 
 export const quantityDecrementAsync = createAsyncThunk(
   "cartSlice/quantityDecrementAsync",
-  async (product, { getState }) => {
+  async ({product,dispatch,toast}, { getState }) => {
     try {
-      // const state = getState();
-      const id = localStorage.getItem("id");
-      // const userCart = Array.isArray(state.cartSlice.cart);
-      // ? state.cartSlice.cart.map((item) => {
-      //     if (item._id === product._id && item.quantity > 1) {
-      //       return { ...item, quantity: item.quantity - 1 };
-      //     }
-      //     return item;
-      //   })
-      // : [];
-
-      await api.post(`/user/${id}/cart`, {
-        productId: product.productId._id,
-        quantity: product.quantity,
-        action: "decrement",
-      });
-      const res = await api.get(`/user/${id}/cart`);
-      return res.data.data.products;
-    } catch (error) {
-      console.log("something went wrong!");
-      throw error;
+      const response = await axios.put("https://localhost:7211/api/Cart/decreaseqty",{
+        productId:product.id
+      },{
+        headers:{
+          Authorization:`Bearer ${localStorage.getItem("token")}`
+        }
+      }
+    )
+    if(response.status==200){
+      dispatch(FetchingCart())
+    } 
+    }
+    catch(error){
+      toast.error("something went wrong")
     }
   }
 );
