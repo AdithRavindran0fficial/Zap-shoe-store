@@ -1,0 +1,202 @@
+{
+  "User": [
+    {
+      "id": "66d94d78b076016f12bc7523",
+      "name": "Irfan ",
+      "email": "irfanpv786@gmail.com",
+      "password": "aQ@123456",
+      "address": [
+        "Kinfra Calicut"
+      ],
+      "pincode": [
+        "672594"
+      ],
+      "cart": [],
+      "orders": [],
+      "wishlist": []
+    },
+    {
+      "id": "545a",
+      "name": "admin",
+      "email": "admin@gmail.com",
+      "password": "aQ@123456",
+      "address": [
+        "Kinfra Calicut"
+      ],
+      "pincode": [
+        "741852"
+      ],
+      "cart": [
+        {
+          "title": "JOGFLOW 100 Grips",
+          "imageSrc": "https://contents.mediadecathlon.com/p2393894/ae11c369077717da979826d33db65b1c/p2393894.jpg?format=auto&quality=70&f=650x0",
+          "imageAlt": "Front of men's Basic Tee in black.",
+          "price": "2500",
+          "color": "Khaki ",
+          "category": "men",
+          "quantity": 1,
+          "id": "00a4"
+        },
+        {
+          "title": "Otes Tan Men Ruosh",
+          "imageSrc": "https://img.tatacliq.com/images/i11/437Wx649H/MP000000017535835_437Wx649H_202305142316151.jpeg",
+          "imageAlt": "Front of men's Basic Tee in black.",
+          "price": "3000",
+          "color": "Brown",
+          "category": "men",
+          "quantity": 1,
+          "id": "dc5e"
+        },
+        {
+          "title": "Men's Hiking shoess",
+          "imageSrc": "https://cdn.pixabay.com/photo/2015/02/09/13/41/shoe-629644_960_720.jpg",
+          "imageAlt": "Front of men's Basic Tee in black.",
+          "price": "5000",
+          "color": "Orange",
+          "category": "men",
+          "quantity": 2,
+          "id": "ad01"
+        },
+        {
+          "id": "9f5b",
+          "title": "Women's North Plus",
+          "imageSrc": "https://www.campusshoes.com/cdn/shop/files/NORTHPLUS_11G-677_BLK.jpg?v=1705644888",
+          "imageAlt": "Front of men's Basic Tee in black.",
+          "price": "3500",
+          "color": "Black",
+          "category": "women",
+          "quantity": 2
+        }
+      ],
+      "orders": [
+        {
+          "Orders": [
+            {
+              "title": "Men's Hiking shoe",
+              "imageSrc": "https://cdn.pixabay.com/photo/2015/02/09/13/41/shoe-629644_960_720.jpg",
+              "imageAlt": "Front of men's Basic Tee in black.",
+              "price": "5000",
+              "color": "Orange",
+              "category": "men",
+              "quantity": 2,
+              "id": "ad01"
+            },
+            {
+              "title": "Otes Tan Men Ruosh",
+              "imageSrc": "https://img.tatacliq.com/images/i11/437Wx649H/MP000000017535835_437Wx649H_202305142316151.jpeg",
+              "imageAlt": "Front of men's Basic Tee in black.",
+              "price": "3000",
+              "color": "Brown",
+              "category": "men",
+              "quantity": 1,
+              "id": "dc5e"
+            },
+            {
+              "id": "00a4",
+              "title": "JOGFLOW 100 Grip",
+              "imageSrc": "https://contents.mediadecathlon.com/p2393894/ae11c369077717da979826d33db65b1c/p2393894.jpg?format=auto&quality=70&f=650x0",
+              "imageAlt": "Front of men's Basic Tee in black.",
+              "price": "2500",
+              "color": "Khaki ",
+              "category": "men",
+              "quantity": 1
+            },
+            {
+              "id": "9f5b",
+              "title": "Women's North Plus",
+              "imageSrc": "https://www.campusshoes.com/cdn/shop/files/NORTHPLUS_11G-677_BLK.jpg?v=1705644888",
+              "imageAlt": "Front of men's Basic Tee in black.",
+              "price": "3500",
+              "color": "Black",
+              "category": "women",
+              "quantity": 3
+            }
+          ],
+          "CustomerName": "sadfgh",
+          "Total": 26000,
+          "DeliveryAddress": [
+            "Kinfra Calicut"
+          ],
+          "DeliveryPincode": [
+            "741852"
+          ]
+        },
+        {
+          "Orders": [
+            {
+              "title": "Men's Hiking shoe",
+              "imageSrc": "https://cdn.pixabay.com/photo/2015/02/09/13/41/shoe-629644_960_720.jpg",
+              "imageAlt": "Front of men's Basic Tee in black.",
+              "price": "5000",
+              "color": "Orange",
+              "category": "men",
+              "quantity": 1,
+              "id": "ad01"
+            },
+            {
+              "id": "9f5b",
+              "title": "Women's North Plus",
+              "imageSrc": "https://www.campusshoes.com/cdn/shop/files/NORTHPLUS_11G-677_BLK.jpg?v=1705644888",
+              "imageAlt": "Front of men's Basic Tee in black.",
+              "price": "3500",
+              "color": "Black",
+              "category": "women",
+              "quantity": 1
+            }
+          ],
+          "CustomerName": "wedfg",
+          "Total": 8500,
+          "DeliveryAddress": [
+            "Kinfra Calicut"
+          ],
+          "DeliveryPincode": [
+            "741852"
+          ]
+        }
+      ],
+      "wishlist": []
+    }
+  ],
+  "products": [
+    {
+      "title": "Otes Tan Men Ruoshi",
+      "imageSrc": "https://img.tatacliq.com/images/i11/437Wx649H/MP000000017535835_437Wx649H_202305142316151.jpeg",
+      "imageAlt": "Front of men's Basic Tee in black.",
+      "price": "3000",
+      "color": "Brown",
+      "category": "men",
+      "quantity": 1,
+      "id": "66daea686f03fb98c17b50d3"
+    },
+    {
+      "title": "Men's Hiking shoess",
+      "imageSrc": "https://cdn.pixabay.com/photo/2015/02/09/13/41/shoe-629644_960_720.jpg",
+      "imageAlt": "Front of men's Basic Tee in black.",
+      "price": "5000",
+      "color": "Orange",
+      "category": "men",
+      "quantity": 1,
+      "id": "ad01"
+    },
+    {
+      "title": "JOGFLOW 100 Grips",
+      "imageSrc": "https://contents.mediadecathlon.com/p2393894/ae11c369077717da979826d33db65b1c/p2393894.jpg?format=auto&quality=70&f=650x0",
+      "imageAlt": "Front of men's Basic Tee in black.",
+      "price": "2500",
+      "color": "Khaki ",
+      "category": "men",
+      "quantity": 1,
+      "id": "00a4"
+    },
+    {
+      "id": "9f5b",
+      "title": "Women's North Plus",
+      "imageSrc": "https://www.campusshoes.com/cdn/shop/files/NORTHPLUS_11G-677_BLK.jpg?v=1705644888",
+      "imageAlt": "Front of men's Basic Tee in black.",
+      "price": "3500",
+      "color": "Black",
+      "category": "women",
+      "quantity": 1
+    }
+  ]
+}
