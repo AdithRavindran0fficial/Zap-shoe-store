@@ -15,8 +15,7 @@ import {
   clearCart,
   quantityDecrementAsync,
   quantityIncrementAsync,
-  removeFromCartAsync,
-  settingCart,
+  removeFromCartAsync
 } from "../../../../Redux/cartSlice/cartSlice";
 // import axios from "axios";
 import logo from "../../../Assets/Logo.png";
@@ -165,10 +164,10 @@ export default function CartPage() {
                               className="-my-6 divide-y divide-gray-200"
                             >
                               {cart?.map((product) => (
-                                <li key={product._id} className="flex py-6">
+                                <li key={product.id} className="flex py-6">
                                   <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
                                     <img
-                                      src={product.productId.imageSrc}
+                                      src={product.img}
                                       alt={product.productId.imageAlt}
                                       className="h-full w-full object-cover object-center"
                                     />
@@ -179,7 +178,7 @@ export default function CartPage() {
                                       <div className="flex justify-between text-base font-medium text-gray-900">
                                         <h3>
                                           <a href={product.productId.href}>
-                                            {product.productId.title}
+                                            {product.title}
                                           </a>
                                         </h3>
                                         <span className="ml-4">

@@ -1,22 +1,17 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 // import axios from "axios";
 import api from "../../utils/axios";
+import axios from "axios";
 
 const INITIAL_STATE = {
   cart: [],
 };
-export const settingCart = createAsyncThunk(
-  "cartSlice/settingCart",
+export const FetchingCart = createAsyncThunk(
+  "cartSlice/FetchingCart",
   async (_, { rejectWithValue }) => {
     try {
-      const id = localStorage.getItem("id");
-      if (!id) {
-        return rejectWithValue("User ID not found");
-      }
-
-      const res = await api.get(`/user/${id}/cart`);
-
-      return res.data?.data?.products;
+      const res = await api.get("/Cart/Cart")
+      return res.data.data
     } catch (error) {
       console.error("Something went wrong!", error.message);
       return rejectWithValue(error.message);
@@ -26,45 +21,36 @@ export const settingCart = createAsyncThunk(
 
 export const addToCartAsync = createAsyncThunk(
   "cartSlice/addToCartAsync",
-  async (product, { getState }) => {
-    try {
-      // const state = getState();
-      const id = localStorage.getItem("id");
-      // let userCart = Array.isArray(state.cartSlice.cart)
-      //   ? [...state.cartSlice.cart]
-      //   : [];
-
-      // const existingProductIndex = userCart.findIndex(
-      //   (item) => item._id === product._id
-      // );
-
-      // if (existingProductIndex !== -1) {
-      //   userCart = userCart.map((item, index) => {
-      //     if (index === existingProductIndex) {
-      //       return { ...item, quantity: item.quantity + product.quantity };
-      //     }
-      //     return item;
-      //   });
-      // } else {
-      //   userCart.push({ ...product, quantity: product.quantity });
-      // }
-
-      // console.log(userCart);
-
-      await api.post(`/user/${id}/cart`, {
-        productId: product._id,
-        quantity: product.quantity,
-      });
-      // console.log(state.cartSlice.cart.push(product))
-
-      const res = await api.get(`/user/${id}/cart`);
-      return res.data.data.products;
-    } catch (error) {
-      console.error("Something went wrong!", error.message);
-      throw error;
+  async ({product,toast,dispatch}, { getState }) => {
+    try {   
+      // const id = localStorage.getItem("id");
+      console.log(`going to post product to cart this from thunk this is id ${product.id}`);
+      console.log(localStorage.getItem("token"))
+      
+     const res =  await api.post("https://localhost:7211/api/Cart/Addtocart", {
+        productId:product.id
+      },
+    );
+  console.log(`${res.data.message} this from addto cart function thunk`);
+    if(res.status==200){
+      toast.success("Product added Successfully");
+      dispatch(FetchingCart())
+    }
+   
+  }
+  catch(error){
+    if(error.response.status==401){
+      toast.error("Authentication problem")
+    }
+    if(error.response.status==400){
+      toast.error("Item already in cart")     
+    }
+    if(error.response.status==500){
+      toast.error("Something went wrong")     
     }
   }
-);
+
+});
 
 export const removeFromCartAsync = createAsyncThunk(
   "cartSlice/removeFromCartAsync",
@@ -162,19 +148,20 @@ const cartSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(settingCart.pending, (state) => {
+      .addCase(FetchingCart.pending, (state) => {
         console.log("cart is loading");
       })
-      .addCase(settingCart.rejected, (state) => {
+      .addCase(FetchingCart.rejected, (state) => {
         console.log("Error in fetching cart");
       })
-      .addCase(settingCart.fulfilled, (state, action) => {
+      .addCase(FetchingCart.fulfilled, (state, action) => {
         console.log("cart updated successfully");
         state.cart = action.payload;
         // console.log(action.payload)
       })
       .addCase(addToCartAsync.fulfilled, (state, action) => {
-        state.cart = action.payload;
+        // state.cart = action.payload;
+        console.log("Succesfuly aded this from inside addto slice")
       })
       .addCase(removeFromCartAsync.fulfilled, (state, action) => {
         state.cart = action.payload;

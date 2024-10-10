@@ -39,7 +39,8 @@ export default function ProductDetail() {
   const { id } = useParams();
   const idNum = id.slice();
 
-  const product = products?.data?.find((item) => item._id === idNum);
+  const product = products.data.find((item) => item.id == idNum);
+  console.log(`this is from productdetail ${product}`)
 
   // console.log(products);
 
@@ -57,11 +58,12 @@ export default function ProductDetail() {
     }
   };
   // console.log(newQuantity);
-  const handleCart = () => {
-    const productToAdd = { ...product, quantity: newQuantity };
+  const handleCart = (product) => {
+    // const productToAdd = { ...product, quantity: newQuantity };
     // addToCart(productToAdd);
-    dispatch(addToCartAsync(productToAdd));
-    toast.success("Product added Successfully");
+    dispatch(addToCartAsync({product,toast,dispatch}));
+    console.log("this is after dispatch to adding cart")
+    
   };
   // const newQuantity =product.quantity
 
@@ -107,8 +109,7 @@ export default function ProductDetail() {
                       <div className="aspect-h-3 aspect-w-2 overflow-hidden rounded-lg bg-gray-100 sm:col-span-4 lg:col-span-5">
                         <div className="group relative">
                           <img
-                            src={product?.imageSrc}
-                            alt={product?.imageAlt}
+                            src={product?.img}
                             className="object-cover object-center"
                           />
                         </div>
@@ -249,7 +250,7 @@ export default function ProductDetail() {
                                 ))}
                               </RadioGroup>
                             </fieldset>
-                            <p className="text-gray-500 pt-10">
+                            {/* <p className="text-gray-500 pt-10">
                               <button
                                 type="button"
                                 onClick={() => handleChange(-1)}
@@ -265,7 +266,7 @@ export default function ProductDetail() {
                               >
                                 +
                               </button>
-                            </p>
+                            </p> */}
                             <Link to={"/products"}>
                               <button
                                 onClick={() => handleCart(product)}

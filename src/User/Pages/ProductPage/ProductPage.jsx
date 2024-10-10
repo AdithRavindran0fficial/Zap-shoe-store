@@ -17,6 +17,7 @@ const ProductPage = () => {
   const filteredProducts = useSelector(
     (state) => state.productSlice.filteredProducts
   );
+  console.log("this is from product detail page ",filteredProducts.img)
 
   const [isWishlistedMap, setIsWishlistedMap] = useState({});
 
@@ -54,7 +55,7 @@ const ProductPage = () => {
       toast.success("Product removed from wishlist");
     } else {
       const product = filteredProducts?.data?.find(
-        (item) => item._id === productId
+        (item) => item.id === productId
       );
       if (product) {
         dispatch(addToWishListAsync(product));
@@ -74,12 +75,12 @@ const ProductPage = () => {
             </h2>
             <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
               {filteredProducts?.data?.map((product) => {
-                const isWishlisted = isWishlistedMap[product._id] || false;
+                const isWishlisted = isWishlistedMap[product.id] || false;
 
                 return (
                   <div key={product.id} className="group relative">
                     <button
-                      onClick={() => handleWishlist(product._id)}
+                      onClick={() => handleWishlist(product.id)}
                       className={`absolute top-3 right-3 z-10 p-2 rounded-full shadow-md focus:outline-none ${
                         isWishlisted
                           ? "bg-red-500 text-white"
@@ -108,13 +109,13 @@ const ProductPage = () => {
                         />
                       </svg>
                     </button>
-                    <Link to={`/products/${product._id}`}>
+                    <Link to={`/products/${product.id}`}>
                       <div
                         className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-gray-200 lg:aspect-none group-hover:opacity-75   
  sm:h-80 border"
                       >
                         <img
-                          src={product.imageSrc}
+                          src={product.img}
                           alt={product.imageAlt}
                           className="h-full w-full object-cover object-center lg:h-full lg:w-full"
                         />

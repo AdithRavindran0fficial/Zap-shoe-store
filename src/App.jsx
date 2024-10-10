@@ -26,7 +26,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUsers } from "../Redux/usersSlice/usersSlice";
 import { fetchProducts } from "../Redux/productSlice/productSlice";
-import { settingCart } from "../Redux/cartSlice/cartSlice";
+// import { settingCart } from "../Redux/cartSlice/cartSlice";
 import { login } from "../Redux/logSlice/logSlice";
 import { Toaster } from "react-hot-toast";
 import { settingWishList } from "../Redux/wishlistSlice/wishlistSlice";
@@ -63,7 +63,7 @@ function App() {
 
   useEffect(() => {
     if (userId && isLogged) {
-      dispatch(settingCart());
+      // dispatch(settingCart());
       dispatch(settingWishList());
     }
   }, [userId, isLogged, dispatch]);
