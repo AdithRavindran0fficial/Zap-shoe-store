@@ -30,6 +30,7 @@ import { fetchProducts } from "../Redux/productSlice/productSlice";
 import { login } from "../Redux/logSlice/logSlice";
 import { Toaster } from "react-hot-toast";
 import { settingWishList } from "../Redux/wishlistSlice/wishlistSlice";
+import { TotalRevenueFetch, TotalSalesFetch } from '../Redux/OrderSlice/OrderSlice';
 
 function App() {
   const id = localStorage.getItem("id");
@@ -52,6 +53,9 @@ function App() {
   useEffect(() => {
     dispatch(fetchUsers());
     dispatch(fetchProducts());
+    dispatch(TotalRevenueFetch())
+    dispatch(TotalSalesFetch())
+    dispatch(settingWishList())
   }, [dispatch]);
 
   useEffect(() => {

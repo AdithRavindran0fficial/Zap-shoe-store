@@ -8,7 +8,7 @@ import SearchBar from "../../../G-Components/SearchBar/SearchBar";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Categorize,
-  deleteProduct,
+  DeleteProduct
 } from "../../../../Redux/productSlice/productSlice";
 import api from "../../../../utils/axios";
 
@@ -26,10 +26,8 @@ export const AdminProductPage = () => {
   };
 
   const handleProductRemove = (product) => {
-    api.delete(`/admin/${product._id}/product`).then(() => {
-      dispatch(deleteProduct(product));
-      toast.success(`Product '${product.title}' Removed`);
-    });
+    
+    dispatch(DeleteProduct({product}))
   };
   const navigate = useNavigate();
 
@@ -84,11 +82,10 @@ export const AdminProductPage = () => {
 
             <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
               {filteredProducts.data?.map((product) => (
-                <div key={product._id} className="group relative">
+                <div key={product.id} className="group relative">
                   <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-gray-200 lg:aspect-none group-hover:opacity-75 sm:h-80 border">
                     <img
-                      src={product.imageSrc}
-                      alt={product.imageAlt}
+                      src={product.img}
                       className="h-full w-full object-cover object-center lg:h-full lg:w-full"
                     />
                   </div>
@@ -109,7 +106,7 @@ export const AdminProductPage = () => {
                     <div className="text-center">
                       <button
                         onClick={() => {
-                          navigate(`/admin/products/:${product._id}`);
+                          navigate(`/admin/products/:${product.id}`);
                         }}
                         type="button"
                         className="rounded-md bg-indigo-600 w-1/2  py-2  mt-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"

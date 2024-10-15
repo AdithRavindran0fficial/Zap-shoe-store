@@ -1,13 +1,19 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../utils/axios";
 import toast from "react-hot-toast";
+import axios from "axios";
 
 export const settingWishList = createAsyncThunk(
   "wishlist/settingWishList",
   async (_, { rejectWithValue }) => {
     try {
       const id = localStorage.getItem("id");
-      const response = await api.get(`/user/${id}/wishlists`);
+      const response = await axios.get(`https://localhost:7211/api/WhishList/all`,{
+        headers:{
+          Authorization:`Bearer ${localStorage.getItem("token")}`
+        }
+      });
+      // console.log(response.data.data)
       return response.data?.data;
     } catch (error) {
       return rejectWithValue("Failed to fetch wishlist");
@@ -19,9 +25,14 @@ export const addToWishListAsync = createAsyncThunk(
   "wishlist/addToWishListAsync",
   async (product, { rejectWithValue, dispatch }) => {
     try {
-      const id = localStorage.getItem("id");
-      await api.post(`/user/${id}/wishlists`, { productId: product._id });
-      dispatch(settingWishList());
+      const res = await axios.post(`https://localhost:7211/api/WhishList/Add?productid=${product.id}`,{},{
+        headers:{
+          Authorization:`Bearer ${localStorage.getItem("token")}`
+        }
+      });
+      if(res.status==200){
+        dispatch(settingWishList());
+      }  
       return product;
     } catch (error) {
       if (error.response?.status === 400) {
@@ -39,11 +50,15 @@ export const removeFromWishListAsync = createAsyncThunk(
   async (productId, { rejectWithValue, dispatch }) => {
     try {
       const id = localStorage.getItem("id");
-      await api.delete(`/user/${id}/wishlists`, { data: { productId } });
+      await axios.delete(`https://localhost:7211/api/WhishList/Remove?id=${productId}`, {
+        headers:{
+          Authorization:`Bearer ${localStorage.getItem("token")}`
+        }
+      });
       dispatch(settingWishList());
       return productId;
     } catch (error) {
-      toast.error("Failed to remove from wishlist");
+      // toast.error("Failed to remove from wishlist");
       return rejectWithValue("Failed to remove from wishlist");
     }
   }

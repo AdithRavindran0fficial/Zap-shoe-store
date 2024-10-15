@@ -16,11 +16,11 @@ export const FetchingCart = createAsyncThunk(
           Authorization:`Bearer ${localStorage.getItem("token")}`
         }
       })
-      console.log(`this is from fetching carts ${res.data}`);
+      // console.log(`this is from fetching carts ${res.data}`);
       
       return res.data.data
     } catch (error) {
-      console.error("Something went wrong!", error.message);
+      // console.error("Something went wrong!", error.message);
       return rejectWithValue(error.message);
     }
   }
@@ -31,8 +31,8 @@ export const addToCartAsync = createAsyncThunk(
   async ({product,toast}, { getState }) => {
     try {   
       // const id = localStorage.getItem("id");
-      console.log(`going to post product to cart this from thunk this is id ${product.id}`);
-      console.log(localStorage.getItem("token"))
+      // console.log(`going to post product to cart this from thunk this is id ${product.id}`);
+      // console.log(localStorage.getItem("token"))
       
      const res =  await axios.post("https://localhost:7211/api/Cart/Addtocart", {
         productId:product.id
@@ -42,7 +42,7 @@ export const addToCartAsync = createAsyncThunk(
         }
       }
     );
-  console.log(`${res.data.message} this from addto cart function thunk`);
+  // console.log(`${res.data.message} this from addto cart function thunk`);
     if(res.status==200){
       toast.success("Product added Successfully");
       return res.data.data
@@ -80,7 +80,7 @@ export const removeFromCartAsync = createAsyncThunk(
       
       }
      catch (error) {
-      console.log("something went wrong!");
+      // console.log("something went wrong!");
       toast.error("something went wrong")
     }
   }
@@ -144,19 +144,19 @@ const cartSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(FetchingCart.pending, (state) => {
-        console.log("cart is loading");
+        // console.log("cart is loading");
       })
       .addCase(FetchingCart.rejected, (state) => {
-        console.log("Error in fetching cart");
+        // console.log("Error in fetching cart");
       })
       .addCase(FetchingCart.fulfilled, (state, action) => {
-        console.log("cart updated successfully");
+        // console.log("cart updated successfully");
         state.cart = action.payload;
         // console.log(action.payload)
       })
       .addCase(addToCartAsync.fulfilled, (state, action) => {
         // state.cart = action.payload;
-        console.log("Succesfuly aded this from inside addto slice")
+        // console.log("Succesfuly aded this from inside addto slice")
       })
       .addCase(removeFromCartAsync.fulfilled, (state, action) => {
         state.cart = action.payload;

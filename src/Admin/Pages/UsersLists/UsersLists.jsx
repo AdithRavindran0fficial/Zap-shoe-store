@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import SearchBar from "../../../G-Components/SearchBar/SearchBar";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteUser } from "../../../../Redux/usersSlice/usersSlice";
+import { DeleteUser} from "../../../../Redux/usersSlice/usersSlice";
 import api from "../../../../utils/axios";
 import { useEffect, useState } from "react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
@@ -16,15 +16,8 @@ export default function UsersLists() {
   const userLogin = localStorage.getItem("id");
 
   const handleDeleteUser = (users) => {
-    api
-      .delete(`/admin/${users._id}/deleteuser`)
-      .then(() => {
-        dispatch(deleteUser(users));
-        toast.success(`User '${users.username}' deleted successfully`);
-      })
-      .catch((err) => toast.error("Failed to delete user"));
-  };
-  // console.log(filteredUsers);
+    dispatch(DeleteUser({users}))
+  }
   return (
     <>
       <SearchBar />
@@ -50,21 +43,21 @@ export default function UsersLists() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 text-center tracking-wider">
-            {filteredUsers.data?.map((user) => (
-              <tr key={user._id}>
+            {filteredUsers.map((user) => (
+              <tr key={user.id}>
                 <td className="whitespace-nowrap px-4 py-2 font-medium text-gray-900 ">
-                  {user._id}
+                  {user.id}
                 </td>
                 <td className="sticky left-0 bg-white whitespace-nowrap px-4 py-2 text-gray-700">
-                  {user.username}
+                  {user.userName}
                 </td>
                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                  {user.email}
+                  {user.userEmail}
                 </td>
                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                   <button
                     onClick={() => {
-                      navigate(`/admin/userslist/user/:${user._id}/orders`);
+                      navigate(`/admin/userslist/user/:${user.id}/orders`);
                     }}
                     type="button"
                     className="px-2.5 py-1 rounded-md bg-lime-600 text-white font-semibold text-base  shadow hover:bg-lime-700 focus:outline-none  focus:ring-lime-700"

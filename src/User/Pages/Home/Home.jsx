@@ -23,6 +23,7 @@ import { toast } from "react-toastify";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../../../../Redux/logSlice/logSlice";
 import { Categorize} from "../../../../Redux/productSlice/productSlice";
+import { settingWishList } from "../../../../Redux/wishlistSlice/wishlistSlice";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -42,19 +43,20 @@ export default function Home() {
   const [showOrders, setShowOrders] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [showWishList, setShowWishList] = useState(false);
-  const user = filteredUsers?.data?.find((user) => user._id === userLogin);
+  // const user = filteredUsers?.find((user) => user.id === userLogin);
+  // console.log(filteredUsers);
+  
 
   useEffect(() => {
-    api
-      .get(`/user/${userLogin}/orders`)
-      .then((res) => setUserOrders([res.data.data]))
-      .catch((error) => console.error(error.message));
-    if (userLogin && filteredUsers?.data?.length > 0) {
+    dispatch(settingWishList())
+    // console.log(wishlist);
       // console.log(user);
-      if (user) {
+      
+        // console.log(wishlist)
         setUserWish(wishlist);
-      }
-    }
+        // console.log(`this is whishlish ${userWish}`)
+      
+    
   }, [userLogin, filteredUsers, wishlist]);
 
   // console.log(wishlist);
@@ -169,14 +171,14 @@ const handleRefundRequest = async (orderId) => {
               </button>
             </div>
             <PopoverGroup className="hidden lg:flex lg:gap-x-12">
-              {user?.role == "admin" && (
+              {/* {user?.role == "Admin" && (
                 <Link
                   to="/admin"
                   className="text-sm font-semibold leading-6 text-gray-900"
                 >
                   Go to admin
                 </Link>
-              )}
+              )} */}
 
               <Link
                 to="/"
@@ -466,7 +468,7 @@ const handleRefundRequest = async (orderId) => {
                                     Quantity: {product.quantity}
                                   </p>
                                   <p className="text-gray-700">
-                                    Price: ₹{product.productId.price}
+                                    Price: ₹{product.price}
                                   </p>
                                   <p className="text-gray-700">
                                     Total: ₹
@@ -538,12 +540,12 @@ const handleRefundRequest = async (orderId) => {
                       <th className="px-6 py-3 text-gray-700 font-semibold">
                         Product Title
                       </th>
-                      <th className="px-6 py-3 text-gray-700 font-semibold">
+                      {/* <th className="px-6 py-3 text-gray-700 font-semibold">
                         Product Color
-                      </th>
-                      <th className="px-6 py-3 text-gray-700 font-semibold">
+                      </th> */}
+                      {/* <th className="px-6 py-3 text-gray-700 font-semibold">
                         Product Quantity
-                      </th>
+                      </th> */}
                       <th className="px-6 py-3 text-gray-700 font-semibold">
                         Product Price
                       </th>
@@ -552,27 +554,27 @@ const handleRefundRequest = async (orderId) => {
                   <tbody className="divide-y divide-gray-200">
                     {userWish?.map((wish) => (
                       <tr
-                        key={wish._id}
+                        key={wish.id}
                         className="odd:bg-white even:bg-gray-50"
                       >
                         <td className="px-4 py-4">
                           <img
-                            src={wish.productId.imageSrc}
-                            alt={wish.productId.title}
+                            src={wish.img}
+                            alt={wish.title}
                             className="h-16 w-16 object-cover rounded-lg"
                           />
                         </td>
                         <td className="px-6 py-4 font-medium text-gray-900">
-                          {wish.productId.title}
+                          {wish.title}
                         </td>
-                        <td className="px-6 py-4 text-gray-700">
+                        {/* <td className="px-6 py-4 text-gray-700">
                           {wish.productId.color}
-                        </td>
+                        </td> */}
+                        {/* <td className="px-6 py-4 text-gray-700">
+                          {wish.quantity}
+                        </td> */}
                         <td className="px-6 py-4 text-gray-700">
-                          {wish.productId.quantity}
-                        </td>
-                        <td className="px-6 py-4 text-gray-700">
-                          ₹{wish.productId.price}
+                          ₹{wish.price}
                         </td>
                       </tr>
                     ))}

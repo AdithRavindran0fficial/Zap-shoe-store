@@ -1,41 +1,43 @@
-// import axios from "axios";
 import { Field, Form, Formik, ErrorMessage } from "formik";
 import React from "react";
-// import { toast } from "react-toastify";
 import toast from "react-hot-toast";
 import * as yup from "yup";
 import api from "../../../../utils/axios";
 import { useDispatch } from "react-redux";
-import { addProduct } from "../../../../Redux/productSlice/productSlice";
+import { Addproduct } from "../../../../Redux/productSlice/productSlice";
+import axios from "axios";
 
 const AdminAddProduct = () => {
   const dispatch = useDispatch();
+
   const validationSchema = yup.object({
-    title: yup.string().required("This Field is Required"),
-    imageSrc: yup.string().url().required("This Field is Required"),
-    imageAlt: yup.string().required("This Field is Required"),
-    price: yup.number().required("This Field is Required"),
-    color: yup.string().required("This Field is Required"),
-    category: yup.string().required("This Field is Required"),
+    Title: yup.string().required("This Field is Required"),
+    Description: yup.string().required("This Field is Required"),
+    Price: yup.number().required("This Field is Required"),
+    CategoryId: yup.number().required("This Field is Required").typeError("Category must be a number"),
+    Quantity: yup.number().required("This Field is Required").min(1, "Quantity must be at least 1"),
+    img: yup.mixed().required("An image file is required").test("fileType", "Only JPEG and PNG files are supported", (value) => {
+      return value && (value.type === "image/jpeg" || value.type === "image/png");
+    }),
   });
 
-  const handleSubmit = async (
-    values,
-    { setSubmitting, setErrors, resetForm }
-  ) => {
-    try {
-      const response = await api.post("/admin/product", values);
-      dispatch(addProduct(response.data.data));
-      toast.success(`Added "${values.title}" succesfully`);
-      resetForm();
-      // console.log(values);
-    } catch (error) {
-      resetForm();
-      setErrors({ submit: error.message });
-    } finally {
-      setSubmitting(false);
-    }
+  const handleSubmit = async (values) => {
+    console.log("Submitting form with values:", values);
+  
+    const formData = new FormData();
+    formData.append("Title", values.title); 
+    formData.append("Description", values.description);
+    formData.append("Price", values.price);
+    formData.append("CategoryId", parseInt(values.category, 10));
+    formData.append("Quantity", values.quantity);
+    if (values.image) {
+      formData.append("img", values.image);
+  }
+   
+       dispatch(Addproduct({formData}));
+      // toast.success("Product added successfully!"); 
   };
+  
 
   return (
     <div>
@@ -48,25 +50,24 @@ const AdminAddProduct = () => {
           <Formik
             initialValues={{
               title: "",
-              imageSrc: "",
-              imageAlt: "",
+              description: "", // Initialize description
               price: "",
-              color: "",
-              category: "",
+              category: "", // Keep as string for the form input
               quantity: 1,
+              image: null,
             }}
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
           >
-            {({ isSubmitting }) => (
-              <Form className="overflow-y-auto sm:h-96 h-full mb-0 mt-6 space-y-4 rounded-lg p-4 shadow-lg sm:p-6 lg:p-8 sm:ms-20 ">
+            {({ setFieldValue }) => (
+              <Form className="overflow-y-auto sm:h-96 h-full mb-0 mt-6 space-y-4 rounded-lg p-4 shadow-lg sm:p-6 lg:p-8 sm:ms-20">
                 <p className="text-center text-lg font-medium">
                   Add products to your cart
                 </p>
 
                 <div>
                   <label
-                    htmlFor=""
+                    htmlFor="title"
                     className="block ps-1.5 pb-1 text-sm text-start font-medium leading-6 text-gray-400"
                   >
                     Product Title
@@ -85,51 +86,33 @@ const AdminAddProduct = () => {
                     />
                   </div>
                 </div>
+
                 <div>
                   <label
-                    htmlFor=""
+                    htmlFor="description"
                     className="block ps-1.5 pb-1 text-sm text-start font-medium leading-6 text-gray-400"
                   >
-                    ImageSrc
+                    Description
                   </label>
                   <div className="relative">
                     <Field
-                      name="imageSrc"
-                      type="text"
-                      className="w-full rounded-md mb-2 border-gray-200 p-3 pe-12 text-sm shadow-sm border"
-                      placeholder="Enter ImageSrc"
+                      name="description"
+                      as="textarea" // Make it a textarea for better UX
+                      rows="4" // Set the number of rows
+                      className="w-full rounded-md mb-2 border-gray-200 p-3 text-sm shadow-sm border"
+                      placeholder="Enter Description"
                     />
                     <ErrorMessage
                       component="div"
-                      name="imageSrc"
+                      name="description"
                       className="text-red-500 text-sm"
                     />
                   </div>
                 </div>
+
                 <div>
                   <label
-                    htmlFor=""
-                    className="block ps-1.5 pb-1 text-sm text-start font-medium leading-6 text-gray-400"
-                  >
-                    ImageAlt
-                  </label>
-                  <div className="relative">
-                    <Field
-                      name="imageAlt"
-                      type="text"
-                      className="w-full rounded-md mb-2 border-gray-200 p-3 pe-12 text-sm shadow-sm border"
-                      placeholder="Enter ImageAlt"
-                    />
-                    <ErrorMessage
-                      component="div"
-                      name="imageAlt"
-                      className="text-red-500 text-sm"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label
-                    htmlFor=""
+                    htmlFor="price"
                     className="block ps-1.5 pb-1 text-sm text-start font-medium leading-6 text-gray-400"
                   >
                     Price
@@ -148,38 +131,18 @@ const AdminAddProduct = () => {
                     />
                   </div>
                 </div>
+
                 <div>
                   <label
-                    htmlFor=""
+                    htmlFor="category"
                     className="block ps-1.5 pb-1 text-sm text-start font-medium leading-6 text-gray-400"
                   >
-                    Color
+                    Category (Number)
                   </label>
                   <div className="relative">
                     <Field
-                      name="color"
-                      type="text"
-                      className="w-full rounded-md mb-2 border-gray-200 p-3 pe-12 text-sm shadow-sm border"
-                      placeholder="Enter Color"
-                    />
-                    <ErrorMessage
-                      component="div"
-                      name="color"
-                      className="text-red-500 text-sm"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <div className="relative">
-                    <label
-                      htmlFor=""
-                      className="block ps-1.5 pb-1 text-sm text-start font-medium leading-6 text-gray-400"
-                    >
-                      Category
-                    </label>
-                    <Field
                       name="category"
-                      type="text"
+                      type="number" // Change to number input
                       className="w-full rounded-md mb-4 border-gray-200 p-3 pe-12 text-sm shadow-sm border"
                       placeholder="Enter Category"
                     />
@@ -190,11 +153,57 @@ const AdminAddProduct = () => {
                     />
                   </div>
                 </div>
+
+                <div>
+                  <label
+                    htmlFor="quantity"
+                    className="block ps-1.5 pb-1 text-sm text-start font-medium leading-6 text-gray-400"
+                  >
+                    Quantity
+                  </label>
+                  <div className="relative">
+                    <Field
+                      name="quantity"
+                      type="number"
+                      className="w-full rounded-md mb-4 border-gray-200 p-3 pe-12 text-sm shadow-sm border"
+                      placeholder="Enter Quantity"
+                    />
+                    <ErrorMessage
+                      component="div"
+                      name="quantity"
+                      className="text-red-500 text-sm"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="image"
+                    className="block ps-1.5 pb-1 text-sm text-start font-medium leading-6 text-gray-400"
+                  >
+                    Upload Image
+                  </label>
+                  <input
+                    name="image"
+                    type="file"
+                    accept="image/jpeg,image/png"
+                    onChange={(event) => {
+                      setFieldValue("image", event.currentTarget.files[0]);
+                    }}
+                    className="w-full rounded-md mb-4 border-gray-200 p-3 pe-12 text-sm shadow-sm border"
+                  />
+                  <ErrorMessage
+                    component="div"
+                    name="image"
+                    className="text-red-500 text-sm"
+                  />
+                </div>
+
                 <button
-                  onClick={handleSubmit}
                   type="submit"
                   className="block w-full rounded-lg bg-indigo-600 px-5 py-3 text-sm font-medium text-white"
-                  disabled={isSubmitting}
+                  
+                  
                 >
                   Add Product
                 </button>

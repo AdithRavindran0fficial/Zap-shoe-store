@@ -21,6 +21,7 @@ import {
 // import axios from "axios";
 import logo from "../../../Assets/Logo.png";
 import api from "../../../../utils/axios";
+import axios from "axios";
 
 export default function CartPage() {
   const dispatch = useDispatch();
@@ -29,7 +30,7 @@ export default function CartPage() {
   const id = localStorage.getItem("id");
   const { cart } = useSelector((state) => state.cartSlice);
   const { filteredUsers } = useSelector((state) => state.usersSlice);
-  const user = filteredUsers?.data?.find((user) => user._id === id);
+  const user = filteredUsers?.data?.find((user) => user.id === id);
 
   const Subtotal = cart?.reduce((total, product) => {
     return total + product.price * product.quantity;
@@ -43,38 +44,47 @@ useEffect(()=>{
 
   const handleCheckout = async () => {
     try {
-      const response = await api.post(`/user/${id}/payment-gateway`, {
-        currency: "INR",
-        amount: Subtotal * 100,
-      });
-
-      if (response.data.success) {
-        // const { data: order } = response;
-        // console.log(order._id)
+      // Create order first by passing the Subtotal to backend
+      const response = await axios.post(
+        `https://localhost:7211/api/Order/order-create?price=${Subtotal}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`, 
+          },
+        }
+      );
+  
+      if (response.status === 200) {
+        console.log(response.data.data)
+        const { data: orderId } = response.data;
+  
+        // Razorpay payment options
         const options = {
           key: "rzp_test_wL1B6IUAUSnQqu",
-          amount: Subtotal * 100,
+          amount: Subtotal * 100, 
           currency: "INR",
           name: "Kazpix",
           description: "Test Transaction",
           image: "../../../Assets/logo png 3.png",
-          order_id: response.data.data.id,
+          order_id: orderId, 
           handler: async function (response) {
-            // console.log(response);
-            // console.log(response.razorpay_order_id);
-            // console.log(response.razorpay_signature);
-            // console.log(response.razorpay_payment_id);
-            const verificationResponse = await api.post(
-              `/user/${id}/payment-verification`,
+            const verificationResponse = await axios.post(
+              `https://localhost:7211/api/Order/payment`,
               {
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_signature: response.razorpay_signature,
+              },
+              {
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem("token")}`, 
+                },
               }
             );
-            // console.log(verificationResponse);
-            if (verificationResponse?.data?.success) {
-              dispatch(clearCart());
+  
+            if (verificationResponse.data) {
+              dispatch(clearCart()); // Clear cart after successful payment
               toast.success(`You Paid ₹${Subtotal} Successfully`);
               navigate("/products");
             } else {
@@ -94,7 +104,7 @@ useEffect(()=>{
             color: "#3399cc",
           },
         };
-
+  
         const rzp1 = new window.Razorpay(options);
         rzp1.on("payment.failed", function (response) {
           alert(`Payment failed: ${response.error.description}`);
@@ -104,7 +114,7 @@ useEffect(()=>{
         toast.error("Failed to create payment order");
       }
     } catch (error) {
-      if (error.response.status == 404) {
+      if (error.response && error.response.status === 404) {
         toast.error("Cart is empty ");
       } else {
         console.error("Payment Creation Failed:", error);
@@ -112,6 +122,7 @@ useEffect(()=>{
       }
     }
   };
+  
 
   return (
     <>
@@ -189,16 +200,14 @@ useEffect(()=>{
                                           {/* </a> */}
                                         </h3>
                                         <span className="ml-4">
-                                          {/* {product.price *
-                                            product.quantity} */}
+                                          {product.total}
                                         </span>
                                       </div>
                                       <span className=" text-sm text-gray-500">
                                         {/* {product.productId.color} */}
                                       </span>
                                       <p className="mt-1 text-xs float-end text-gray-500">
-                                        {/* {product.productId.price} x{" "}
-                                        {product.quantity} */}
+                                       {product.price}
                                       </p>
                                     </div>
                                     <div className="flex flex-1 items-end justify-between text-sm">

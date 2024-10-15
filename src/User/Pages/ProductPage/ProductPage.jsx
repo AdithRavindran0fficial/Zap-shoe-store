@@ -17,7 +17,7 @@ const ProductPage = () => {
   const filteredProducts = useSelector(
     (state) => state.productSlice.filteredProducts
   );
-  console.log("this is from product detail page ",filteredProducts.img)
+  // console.log("this is from product detail page ",filteredProducts.img)
 
   const [isWishlistedMap, setIsWishlistedMap] = useState({});
 
@@ -33,7 +33,7 @@ const ProductPage = () => {
       setIsWishlistedMap((prevMap) =>
         wishlist.reduce(
           (acc, item) => {
-            acc[item._id] = true;
+            acc[item.id] = true;
             return acc;
           },
           { ...prevMap }
@@ -76,6 +76,8 @@ const ProductPage = () => {
             <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
               {filteredProducts?.data?.map((product) => {
                 const isWishlisted = isWishlistedMap[product.id] || false;
+                // console.log(product);
+                
 
                 return (
                   <div key={product.id} className="group relative">
@@ -116,7 +118,7 @@ const ProductPage = () => {
                       >
                         <img
                           src={product.img}
-                          alt={product.imageAlt}
+                          // alt={product.imageAlt}
                           className="h-full w-full object-cover object-center lg:h-full lg:w-full"
                         />
                       </div>{" "}

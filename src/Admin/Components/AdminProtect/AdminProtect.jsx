@@ -5,15 +5,19 @@ import { Navigate } from "react-router-dom";
 
 export default function AdminProtect({ element }) {
   const { users } = useSelector((state) => state.usersSlice);
+ 
+  
   const id = localStorage.getItem("id");
   const [isAuthorized, setIsAuthorized] = useState(null);
 
   // console.log(users);
 
   useEffect(() => {
-    if (users?.data) {
-      const user = users?.data?.find((user) => user._id === id);
-      if (user?.role === "admin") {
+    if (users) {
+      console.log(users);
+      const user = users.find((user) => user.id == id);
+      console.log(`this is from adminprotect compo ${user}`)
+      if (user?.role === "Admin") {
         setIsAuthorized(true);
       } else {
         setIsAuthorized(false);

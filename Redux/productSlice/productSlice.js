@@ -1,6 +1,9 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 // import axios from "axios";
 import api from "../../utils/axios";
+import axios from "axios";
+import toast from "react-hot-toast";
+// import { fetchUsers } from "../usersSlice/usersSlice";
 // import { build } from "vite";
 
 export const fetchProducts = createAsyncThunk(
@@ -32,12 +35,104 @@ export const SearchFilter = createAsyncThunk(
 export const Categorize = createAsyncThunk(
   "ProductSlice/Categorize",
   async({cat})=>{
-    const res = await api.get(`/Product/${cat}`);
+    const res = await axios.get(`https://localhost:7211/api/Product/${cat}`);
 
-    console.log(`this is from category thunk${cat}`)
+    // console.log(`this is from category thunk${cat}`)
     console.log(res.data.data)
     return res.data
    
+  }
+)
+export const Addproduct= createAsyncThunk(
+  "ProductSlice/Addproduct",
+  async({formData},{dispatch})=>{
+    console.log("this is from thunk");
+    
+    for(values in formData){
+     console.log(formData[values]) 
+    }
+    
+    try{
+      const resp = await axios.post("https://localhost:7211/api/Product/AddProduct",formData,{
+        headers:{
+          "Content-Type": "multipart/form-data",
+            Authorization:`Bearer ${localStorage.getItem("token")}`
+        }
+      })
+      if(resp.status==200){
+        toast.success(resp.data.message)
+        dispatch(fetchProducts())
+      }
+
+    }catch(error){
+      toast.error("error occured during adding")
+      console.log("eroor ocured during adding")
+    }
+    
+  }
+)
+
+
+export const updateProduct = createAsyncThunk(
+  "ProductSlice/updateProduct",
+  async ({ values, idNum }, { dispatch }) => {
+    const formData = new FormData();
+    
+    // Ensure CategoryId is handled correctly
+    for (const key in values) {
+      console.log(key);
+      if (key === "CategoryId" && values[key]) {
+        // Ensure CategoryId is a valid number
+        
+        
+        formData.append(key, parseInt(values[key], 10));
+      } else {
+        formData.append(key, values[key]);
+      }
+    }
+
+    try {
+      const res = await axios.put(
+        `https://localhost:7211/api/Product/UpdateProduct/${idNum}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      if (res.status === 200) {
+        toast.success("Product updated successfully");
+        return res.data; 
+      }
+    } catch (error) {
+      console.error("Error occurred while updating:", error);
+      toast.error("Something went wrong while updating the product.");
+      throw error;
+    }
+  }
+);
+
+export const DeleteProduct = createAsyncThunk(
+  "ProductSlice/DeleteProduct",
+  async({product},{dispatch})=>{
+    try{
+      const resp= await axios.delete(`https://localhost:7211/api/Product/Delete/${product.id}`,{
+        headers:{
+          Authorization:`Bearer ${localStorage.getItem("token")}`
+        }
+      })
+      if(resp.status==200){
+        toast.success(`${product.title} removed`)
+        dispatch(fetchProducts())
+      }
+
+    }catch(error){
+      toast.error("something went wrong")
+
+    }
   }
 )
 
@@ -62,10 +157,10 @@ const productSlice = createSlice({
     //   } 
     //   // console.log(action.payload);
     // },
-    addProduct: (state, action) => {
-      state.products.data.push(action.payload);
-      state.filteredProducts.data.push(action.payload);
-    },
+    // addProduct: (state, action) => {
+    //   state.products.data.push(action.payload);
+    //   state.filteredProducts.data.push(action.payload);
+    // },
     deleteProduct: (state, action) => {
       const productId = action.payload._id;
       const products = state.products.data.filter(
@@ -78,19 +173,19 @@ const productSlice = createSlice({
       );
       state.filteredProducts.data = filteredProducts;
     },
-    updateProduct: (state, action) => {
-      const updatedProduct = action.payload;
-      state.products.data = state.products.data.map((product) =>
-        product._id === updatedProduct._id ? updatedProduct : product
-      );
-      state.filteredProducts.data = state.filteredProducts.data.map((product) =>
-        product._id === updatedProduct._id ? updatedProduct : product
-      );
-    },
+    // updateProduct: (state, action) => {
+    //   const updatedProduct = action.payload;
+    //   state.products.data = state.products.data.map((product) =>
+    //     product._id === updatedProduct._id ? updatedProduct : product
+    //   );
+    //   state.filteredProducts.data = state.filteredProducts.data.map((product) =>
+    //     product._id === updatedProduct._id ? updatedProduct : product
+    //   );
+    // },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchProducts.pending, (state, action) => {
-      console.log("loading");
+      // console.log("loading");
     }), 
       builder.addCase(fetchProducts.rejected, (state, action) => {
         console.log("Error in fetching");
@@ -127,6 +222,6 @@ export const {
   
   
   deleteProduct,
-  addProduct,
-  updateProduct,
+  // addProduct,
+  // updateProduct,
 } = productSlice.actions;

@@ -1,74 +1,60 @@
-import React,{ useContext, useState } from "react";
-// import axios from "axios";
+import React, { useState } from "react";
 import { Field, Form, Formik, ErrorMessage } from "formik";
-// import { toast } from "react-toastify";
 import toast from "react-hot-toast";
 import * as yup from "yup";
-import {
-  Dialog,
-  DialogPanel,
-  Transition,
-  TransitionChild,
-} from "@headlessui/react";
+import { Dialog, DialogPanel, Transition, TransitionChild } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import { Link, useNavigate } from "react-router-dom";
-import { useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import api from "../../../../utils/axios";
 import { fetchProducts, updateProduct } from "../../../../Redux/productSlice/productSlice";
-
-// import { CartContext } from "../../../User/Componet/Contexts/Contexts";
 
 export default function AdminProductUpdate() {
   const dispatch = useDispatch();
   const { products } = useSelector((state) => state.productSlice);
-  // const { products } = useContext(CartContext);
   const { id } = useParams();
-  const idNum = id.slice(1);
-  const product = products?.data?.find((item) => item._id === idNum);
+  const idNum = parseInt(id.slice(1), 10);
+  const product = products?.data?.find((item) => item.id === idNum);
   const [open, setOpen] = useState(true);
   const navigate = useNavigate();
 
   const validationSchema = yup.object({
-    title: yup.string().required("This Field is Required"),
-    imageSrc: yup.string().url().required("This Field is Required"),
-    imageAlt: yup.string().required("This Field is Required"),
-    price: yup.number().required("This Field is Required"),
-    color: yup.string().required("This Field is Required"),
-    category: yup.string().required("This Field is Required"),
+    Title: yup.string().required("This Field is Required"),
+    Description: yup.string().required("This Field is Required"),
+    Price: yup.number().required("This Field is Required").positive("Price must be positive").integer("Price must be an integer"),
+    CategoryId: yup.number().required("This Field is Required"),
+    img: yup
+      .mixed()
+      .required("This Field is Required")
+      .test("fileSize", "File too large", (value) => {
+        return value && value.size <= 2 * 1024 * 1024; // 2MB limit
+      })
+      .test("fileFormat", "Unsupported Format", (value) => {
+        return value && ["image/jpg", "image/jpeg", "image/png", "image/gif"].includes(value.type);
+      }),
+    Quantity: yup.number().required("This Field is Required").positive("Quantity must be positive").integer("Quantity must be an integer"),
   });
 
-  const handleSubmit = async (values, { setSubmitting, setErrors }) => {
+  const handleSubmit = async (values) => {
     try {
-      const updated = Object.keys(values).some(
-        (key) => values[key] !== product[key]
-      );
-
-      // console.log(product)
+      const updated = Object.keys(values).some((key) => values[key] !== product[key]);
 
       if (updated) {
-        await api.patch(`/admin/${product._id}/product`, values);
-        dispatch(updateProduct(values));
-        dispatch(fetchProducts());
-
-        toast.success(`Updated product successfully`);
+        await dispatch(updateProduct({ values, idNum }));
+        await dispatch(fetchProducts());
+        toast.success("Product updated successfully");
       } else {
         toast("No changes applied", { icon: "ℹ️" });
       }
       navigate("/admin/productPage");
-      // console.log(values);
     } catch (error) {
-      setErrors({ submit: error.message });
-    } finally {
-      setSubmitting(false);
+      toast.error("An error occurred while updating the product");
     }
   };
 
-  // console.log(products);
   return (
     <>
       <Transition show={open}>
-        <Dialog className="relative z-10" onClose={() => setOpen(true)}>
+        <Dialog className="relative z-10" onClose={() => setOpen(false)}>
           <TransitionChild
             enter="ease-out duration-300"
             enterFrom="opacity-0"
@@ -107,8 +93,8 @@ export default function AdminProductUpdate() {
                       <div className="aspect-h-3 aspect-w-2 overflow-hidden rounded-lg bg-gray-100 sm:col-span-10 lg:col-span-5">
                         <div className="group relative">
                           <img
-                            src={product.imageSrc}
-                            alt={product.imageAlt}
+                            src={product?.img}
+                            alt={product?.title}
                             className="object-cover object-center"
                           />
                         </div>
@@ -122,150 +108,136 @@ export default function AdminProductUpdate() {
                               </h1>
                               <Formik
                                 initialValues={{
-                                  title: `${product.title}`,
-                                  imageSrc: `${product.imageSrc}`,
-                                  imageAlt: `${product.imageAlt}`,
-                                  price: `${product.price}`,
-                                  color: `${product.color}`,
-                                  category: `${product.category}`,
-                                  quantity: 1,
+                                  Title: product?.title || "",
+                                  Description: product?.description || "",
+                                  Price: product?.price || "",
+                                  CategoryId: product?.category || "",
+                                  Quantity: product?.quantity || "",
+                                  img: null,
                                 }}
                                 validationSchema={validationSchema}
                                 onSubmit={handleSubmit}
                               >
-                                {({ isSubmitting }) => (
-                                  <Form className="overflow-y-auto lg:h-80 h-full mb-0 mt-6 space-y-4 rounded-lg p-4 shadow-lg border-t sm:p-6 ">
+                                {({ isSubmitting, setFieldValue }) => (
+                                  <Form className="overflow-y-auto lg:h-80 h-full mb-0 mt-6 space-y-4 rounded-lg p-4 shadow-lg border-t sm:p-6">
                                     <div>
-                                      <label
-                                        htmlFor=""
-                                        className="block ps-1.5 pb-1 text-sm text-start font-medium leading-6 text-gray-400"
-                                      >
+                                      <label className="block ps-1.5 pb-1 text-sm text-start font-medium leading-6 text-gray-400">
                                         Product Title
                                       </label>
                                       <div className="relative">
                                         <Field
-                                          name="title"
+                                          name="Title"
                                           type="text"
                                           className="w-full rounded-md mb-2 border-gray-200 p-3 pe-12 text-sm shadow-sm border"
                                           placeholder="Update Title"
                                         />
                                         <ErrorMessage
                                           component="div"
-                                          name="title"
+                                          name="Title"
                                           className="text-red-500 text-sm"
                                         />
                                       </div>
                                     </div>
                                     <div>
-                                      <label
-                                        htmlFor=""
-                                        className="block ps-1.5 pb-1 text-sm text-start font-medium leading-6 text-gray-400"
-                                      >
-                                        ImageSrc
+                                      <label className="block ps-1.5 pb-1 text-sm text-start font-medium leading-6 text-gray-400">
+                                        Image
                                       </label>
                                       <div className="relative">
-                                        <Field
-                                          name="imageSrc"
-                                          type="text"
+                                        <input
+                                          name="img"
+                                          type="file"
                                           className="w-full rounded-md mb-2 border-gray-200 p-3 pe-12 text-sm shadow-sm border"
-                                          placeholder="Update ImageSrc"
+                                          onChange={(event) => {
+                                            const file = event.currentTarget.files[0];
+                                            if (file) {
+                                              setFieldValue("img", file);
+                                            }
+                                          }}
                                         />
                                         <ErrorMessage
                                           component="div"
-                                          name="imageSrc"
+                                          name="img"
                                           className="text-red-500 text-sm"
                                         />
                                       </div>
                                     </div>
                                     <div>
-                                      <label
-                                        htmlFor=""
-                                        className="block ps-1.5 pb-1 text-sm text-start font-medium leading-6 text-gray-400"
-                                      >
-                                        ImageAlt
+                                      <label className="block ps-1.5 pb-1 text-sm text-start font-medium leading-6 text-gray-400">
+                                        Description
                                       </label>
                                       <div className="relative">
                                         <Field
-                                          name="imageAlt"
+                                          name="Description"
                                           type="text"
                                           className="w-full rounded-md mb-2 border-gray-200 p-3 pe-12 text-sm shadow-sm border"
-                                          placeholder="Update ImageAlt"
+                                          placeholder="Update Description"
                                         />
                                         <ErrorMessage
                                           component="div"
-                                          name="imageAlt"
+                                          name="Description"
                                           className="text-red-500 text-sm"
                                         />
                                       </div>
                                     </div>
                                     <div>
-                                      <label
-                                        htmlFor=""
-                                        className="block ps-1.5 pb-1 text-sm text-start font-medium leading-6 text-gray-400"
-                                      >
+                                      <label className="block ps-1.5 pb-1 text-sm text-start font-medium leading-6 text-gray-400">
                                         Price
                                       </label>
                                       <div className="relative">
                                         <Field
-                                          name="price"
-                                          type="text"
+                                          name="Price"
+                                          type="number"
                                           className="w-full rounded-md mb-2 border-gray-200 p-3 pe-12 text-sm shadow-sm border"
                                           placeholder="Update Price"
                                         />
                                         <ErrorMessage
                                           component="div"
-                                          name="price"
+                                          name="Price"
                                           className="text-red-500 text-sm"
                                         />
                                       </div>
                                     </div>
                                     <div>
-                                      <label
-                                        htmlFor=""
-                                        className="block ps-1.5 pb-1 text-sm text-start font-medium leading-6 text-gray-400"
-                                      >
-                                        Color
+                                      <label className="block ps-1.5 pb-1 text-sm text-start font-medium leading-6 text-gray-400">
+                                        Quantity
                                       </label>
                                       <div className="relative">
                                         <Field
-                                          name="color"
-                                          type="text"
+                                          name="Quantity"
+                                          type="number"
                                           className="w-full rounded-md mb-2 border-gray-200 p-3 pe-12 text-sm shadow-sm border"
-                                          placeholder="Update Color"
+                                          placeholder="Update Quantity"
                                         />
                                         <ErrorMessage
                                           component="div"
-                                          name="color"
+                                          name="Quantity"
                                           className="text-red-500 text-sm"
                                         />
                                       </div>
                                     </div>
                                     <div>
+                                      <label className="block ps-1.5 pb-1 text-sm text-start font-medium leading-6 text-gray-400">
+                                        Category ID
+                                      </label>
                                       <div className="relative">
-                                        <label
-                                          htmlFor=""
-                                          className="block ps-1.5 pb-1 text-sm text-start font-medium leading-6 text-gray-400"
-                                        >
-                                          Category
-                                        </label>
                                         <Field
-                                          name="category"
-                                          type="text"
-                                          className="w-full rounded-md mb-4 border-gray-200 p-3 pe-12 text-sm shadow-sm border"
-                                          placeholder="Update Category"
+                                          name="CategoryId"
+                                          type="number"
+                                          className="w-full rounded-md mb-2 border-gray-200 p-3 pe-12 text-sm shadow-sm border"
+                                          placeholder="Update Category ID"
                                         />
                                         <ErrorMessage
                                           component="div"
-                                          name="category"
+                                          name="CategoryId"
                                           className="text-red-500 text-sm"
                                         />
                                       </div>
                                     </div>
+
                                     <button
-                                      onClick={handleSubmit}
                                       type="submit"
-                                      className="block w-full rounded-lg bg-indigo-600 px-5 py-3 text-sm font-medium text-white"
                                       disabled={isSubmitting}
+                                      className="block w-full rounded-lg bg-indigo-600 px-5 py-3 text-sm font-medium text-white"
                                     >
                                       Update Product
                                     </button>
