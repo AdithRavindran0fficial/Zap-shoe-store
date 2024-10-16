@@ -8,7 +8,7 @@ import NotFoundPage from "./User/Pages/NotFoundPage/NotFoundPage";
 import ProductPage from "./User/Pages/ProductPage/ProductPage";
 import RegistrationPage from "./User/Pages/RegistrationPage/RegistrationPage";
 // import PaymentSection from "./User/Pages/PaymentPage/PaymentPage";
-import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import { Route, BrowserRouter as Router, Routes, useNavigate } from "react-router-dom";
 import ContactPage from "./User/Pages/ContactPage/ContactPage";
 import ProtectedRoute from "./User/Componet/protectedRoute/protectedRoute";
 // import { ToastContainer } from "react-toastify";
@@ -31,11 +31,14 @@ import { login } from "../Redux/logSlice/logSlice";
 import { Toaster } from "react-hot-toast";
 import { settingWishList } from "../Redux/wishlistSlice/wishlistSlice";
 import { TotalRevenueFetch, TotalSalesFetch } from '../Redux/OrderSlice/OrderSlice';
+import PaymentPage from './User/Pages/PaymentPage/PaymentPage';
 
 function App() {
   const id = localStorage.getItem("id");
   const { userId } = useSelector((state) => state.isLogged);
   const { isLogged } = useSelector((state) => state.isLogged);
+  
+ 
   // const { users, filteredUsers } = useSelector((state) => state.usersSlice);
   // const { products, filteredProducts } = useSelector(
   //   (state) => state.productSlice
@@ -63,6 +66,8 @@ function App() {
     if (userId) {
       dispatch(login({ id: userId }));
     }
+  
+  
   }, []);
 
   useEffect(() => {
@@ -97,10 +102,10 @@ function App() {
               path="products/:id"
               element={<ProtectedRoute element={<ProductDetails />} />}
             />
-            {/* <Route
-              path="paymentsection"
-              element={<ProtectedRoute element={<PaymentSection />} />}
-            /> */}
+            <Route
+              path="/Order"
+              element={<ProtectedRoute element={<PaymentPage />} />}
+            />
             <Route path="*" element={<NotFoundPage />} />
           </Route>
           <Route

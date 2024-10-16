@@ -45,11 +45,11 @@ export const Categorize = createAsyncThunk(
 )
 export const Addproduct= createAsyncThunk(
   "ProductSlice/Addproduct",
-  async({formData},{dispatch})=>{
-    console.log("this is from thunk");
+  async(formData,{dispatch})=>{
+    console.log("this is from thunk",formData);
     
-    for(values in formData){
-     console.log(formData[values]) 
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}: ${value}`);
     }
     
     try{
@@ -60,11 +60,14 @@ export const Addproduct= createAsyncThunk(
         }
       })
       if(resp.status==200){
-        toast.success(resp.data.message)
+        toast.success("Product added successfully!");
         dispatch(fetchProducts())
       }
 
     }catch(error){
+      if(error.response.status==400){
+        toast.error("product already exist")
+      }
       toast.error("error occured during adding")
       console.log("eroor ocured during adding")
     }

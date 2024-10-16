@@ -15,6 +15,7 @@ import api from "../../../../utils/axios";
 const LoginPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  
 
   // const { login } = useContext(CartContext);
   const [showPopup, setShowPopup] = useState(false);
@@ -54,12 +55,14 @@ const LoginPage = () => {
             setShowPopup(true);
             localStorage.setItem("id", res.data.data.id);
             localStorage.setItem("token", res.data.data.token);
+            localStorage.setItem("Role",res.data.data.role)
+            
             resetForm();
             dispatch(login({ id: res.data.data.id }));
             console.log(res.data.data.role)
             setTimeout(() => {
               setShowPopup(false);
-              if (res.data.data.role == "Admin") {
+              if (res.data.data.role === "Admin") {
                 navigate("/admin");
               } else {
                 navigate("/");

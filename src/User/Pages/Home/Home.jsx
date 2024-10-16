@@ -24,6 +24,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../../../../Redux/logSlice/logSlice";
 import { Categorize} from "../../../../Redux/productSlice/productSlice";
 import { settingWishList } from "../../../../Redux/wishlistSlice/wishlistSlice";
+import { GetOrderdetails } from "../../../../Redux/OrderSlice/OrderSlice";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -36,15 +37,17 @@ export default function Home() {
   const { cart } = useSelector((state) => state.cartSlice);
   const { wishlist } = useSelector((state) => state.wishlistSlice);
   const { isLogged } = useSelector((state) => state.isLogged);
+  const {Orders} = useSelector((state)=>state.OrderSlice)
   const dispatch = useDispatch();
   const userLogin = localStorage.getItem("id");
-  const [userOrders, setUserOrders] = useState([]);
+  // const [userOrders, setUserOrders] = useState([]);
   const [userWish, setUserWish] = useState([]);
   const [showOrders, setShowOrders] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [showWishList, setShowWishList] = useState(false);
   // const user = filteredUsers?.find((user) => user.id === userLogin);
   // console.log(filteredUsers);
+  console.log(Orders);
   
 
   useEffect(() => {
@@ -62,6 +65,7 @@ export default function Home() {
   // console.log(wishlist);
   // console.log(userOrders);
   const handleShowOrders = () => {
+    dispatch(GetOrderdetails())
     setShowOrders(true);
   };
 
@@ -92,54 +96,54 @@ export default function Home() {
   });
   // console.log(user);
 
-  const handleSubmit = async (values, { resetForm }) => {
-    try {
-      const updateUser = {
-        address: values.address,
-        city: values.city,
-        state: values.state,
-        contact: values.contact,
-        pincode: values.pincode,
-      };
+//   const handleSubmit = async (values, { resetForm }) => {
+//     try {
+//       const updateUser = {
+//         address: values.address,
+//         city: values.city,
+//         state: values.state,
+//         contact: values.contact,
+//         pincode: values.pincode,
+//       };
 
-      await api
-        .patch(`/user/${user._id}/updateinfo`, updateUser)
-        .then(() => {
-          console.log("Update successful");
-          toast.success("Address updated successfully");
-        })
-        .catch((err) => {
-          console.log("Error updating", err.message);
-          // toast.error("Update failed");
-        });
+//       await api
+//         .patch(`/user/${user._id}/updateinfo`, updateUser)
+//         .then(() => {
+//           console.log("Update successful");
+//           toast.success("Address updated successfully");
+//         })
+//         .catch((err) => {
+//           console.log("Error updating", err.message);
+//           // toast.error("Update failed");
+//         });
 
-      resetForm();
-      setShowProfile(false);
-    } catch (err) {
-      console.log("Error caught", err);
-      // toast.error("Something went wrong");
-    }
-  };
+//       resetForm();
+//       setShowProfile(false);
+//     } catch (err) {
+//       console.log("Error caught", err);
+//       // toast.error("Something went wrong");
+//     }
+//   };
 
-  const [loading, setLoading] = useState(false);
+//   const [loading, setLoading] = useState(false);
 
-const handleRefundRequest = async (orderId) => {
-  try {
-    setLoading(true);
-    const response = await api.post(`/user/order/${orderId}/refund`);
+// const handleRefundRequest = async (orderId) => {
+//   try {
+//     setLoading(true);
+//     const response = await api.post(`/user/order/${orderId}/refund`);
 
-    if (response.data.success) {
-      toast.success("Refund request submitted!");
-    } else {
-      toast.error(response.data.message || "Refund request failed.");
-    }
-  } catch (error) {
-    console.error("Error in handleRefundRequest:", error);  // Log the error for debugging
-    toast.error("Error submitting refund request. Please try again later.");
-  } finally {
-    setLoading(false);
-  }
-};
+//     if (response.data.success) {
+//       toast.success("Refund request submitted!");
+//     } else {
+//       toast.error(response.data.message || "Refund request failed.");
+//     }
+//   } catch (error) {
+//     console.error("Error in handleRefundRequest:", error);  // Log the error for debugging
+//     toast.error("Error submitting refund request. Please try again later.");
+//   } finally {
+//     setLoading(false);
+//   }
+// };
 
 
   return (
@@ -432,38 +436,35 @@ const handleRefundRequest = async (orderId) => {
               Order Details
             </h2>
 
-            {userOrders.length > 0 ? (
+            {Orders.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
-                {userOrders
-                  .flatMap((innerArray) => innerArray)
+                {Orders
+                 
                   .map((order) => {
-                    const isDelivered = order.products.every(
-                      (product) => product.isDelivered
-                    );
+                    
                     return (
                       <div
-                        key={order._id}
+                        key={order.id}
                         className="bg-white shadow-lg rounded-lg overflow-hidden flex flex-col justify-between"
                         style={{ minHeight: "350px" }}
                       >
                         <div className="p-4">
-                          {order.products.map((product) => (
-                            <Fragment key={product._id}>
+                            <Fragment key={product.id}>
                               <div className="flex items-center justify-between mb-4">
                                 <div className="w-24 h-24">
                                   <img
-                                    src={product.productId.imageSrc}
-                                    alt={product.productId.title}
+                                    src={product.img}
+                                    alt={product.title}
                                     className="w-full h-full object-cover rounded-lg"
                                   />
                                 </div>
                                 <div className="ml-4 flex-1">
                                   <h3 className="text-lg font-semibold text-gray-900">
-                                    {product.productId.title}
+                                    {product.title}
                                   </h3>
-                                  <p className="text-gray-700">
+                                  {/* <p className="text-gray-700">
                                     Color: {product.productId.color}
-                                  </p>
+                                  </p> */}
                                   <p className="text-gray-700">
                                     Quantity: {product.quantity}
                                   </p>
@@ -477,7 +478,7 @@ const handleRefundRequest = async (orderId) => {
                                 </div>
                               </div>
                             </Fragment>
-                          ))}
+                          
                         </div>
 
                          <div className="p-4 bg-gray-100 mt-auto flex flex-col items-center">

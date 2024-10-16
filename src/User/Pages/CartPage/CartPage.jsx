@@ -30,7 +30,7 @@ export default function CartPage() {
   const id = localStorage.getItem("id");
   const { cart } = useSelector((state) => state.cartSlice);
   const { filteredUsers } = useSelector((state) => state.usersSlice);
-  const user = filteredUsers?.data?.find((user) => user.id === id);
+  const user = filteredUsers?.data?.find((user) => user._id === id);
 
   const Subtotal = cart?.reduce((total, product) => {
     return total + product.price * product.quantity;
@@ -43,84 +43,85 @@ useEffect(()=>{
   
 
   const handleCheckout = async () => {
-    try {
-      // Create order first by passing the Subtotal to backend
-      const response = await axios.post(
-        `https://localhost:7211/api/Order/order-create?price=${Subtotal}`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`, 
-          },
-        }
-      );
+    navigate("/Order")
+    // try {
+    //   // Create order first by passing the Subtotal to backend
+    //   const response = await axios.post(
+    //     `https://localhost:7211/api/Order/order-create?price=${Subtotal}`,
+    //     {},
+    //     {
+    //       headers: {
+    //         Authorization: `Bearer ${localStorage.getItem("token")}`, 
+    //       },
+    //     }
+    //   );
   
-      if (response.status === 200) {
-        console.log(response.data.data)
-        const { data: orderId } = response.data;
+    //   if (response.status === 200) {
+    //     console.log(response.data.data)
+    //     const { data: orderId } = response.data;
   
-        // Razorpay payment options
-        const options = {
-          key: "rzp_test_wL1B6IUAUSnQqu",
-          amount: Subtotal * 100, 
-          currency: "INR",
-          name: "Kazpix",
-          description: "Test Transaction",
-          image: "../../../Assets/logo png 3.png",
-          order_id: orderId, 
-          handler: async function (response) {
-            const verificationResponse = await axios.post(
-              `https://localhost:7211/api/Order/payment`,
-              {
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_signature: response.razorpay_signature,
-              },
-              {
-                headers: {
-                  Authorization: `Bearer ${localStorage.getItem("token")}`, 
-                },
-              }
-            );
+    //     // Razorpay payment options
+    //     const options = {
+    //       key: "rzp_test_wL1B6IUAUSnQqu",
+    //       amount: Subtotal * 100, 
+    //       currency: "INR",
+    //       name: "Kazpix",
+    //       description: "Test Transaction",
+    //       image: "../../../Assets/logo png 3.png",
+    //       order_id: orderId, 
+    //       handler: async function (response) {
+    //         const verificationResponse = await axios.post(
+    //           `https://localhost:7211/api/Order/payment`,
+    //           {
+    //             razorpay_payment_id: response.razorpay_payment_id,
+    //             razorpay_order_id: response.razorpay_order_id,
+    //             razorpay_signature: response.razorpay_signature,
+    //           },
+    //           {
+    //             headers: {
+    //               Authorization: `Bearer ${localStorage.getItem("token")}`, 
+    //             },
+    //           }
+    //         );
   
-            if (verificationResponse.data) {
-              dispatch(clearCart()); // Clear cart after successful payment
-              toast.success(`You Paid ₹${Subtotal} Successfully`);
-              navigate("/products");
-            } else {
-              toast.error("Payment verification failed");
-            }
-          },
-          prefill: {
-            name: user.username,
-            email: user.email,
-            contact: user.contact,
-          },
-          notes: {
-            address: user.address,
-            pincode: user.pincode,
-          },
-          theme: {
-            color: "#3399cc",
-          },
-        };
+    //         if (verificationResponse.data) {
+    //           dispatch(clearCart()); // Clear cart after successful payment
+    //           toast.success(`You Paid ₹${Subtotal} Successfully`);
+    //           navigate("/products");
+    //         } else {
+    //           toast.error("Payment verification failed");
+    //         }
+    //       },
+    //       prefill: {
+    //         name: user.username,
+    //         email: user.email,
+    //         contact: user.contact,
+    //       },
+    //       notes: {
+    //         address: user.address,
+    //         pincode: user.pincode,
+    //       },
+    //       theme: {
+    //         color: "#3399cc",
+    //       },
+    //     };
   
-        const rzp1 = new window.Razorpay(options);
-        rzp1.on("payment.failed", function (response) {
-          alert(`Payment failed: ${response.error.description}`);
-        });
-        rzp1.open();
-      } else {
-        toast.error("Failed to create payment order");
-      }
-    } catch (error) {
-      if (error.response && error.response.status === 404) {
-        toast.error("Cart is empty ");
-      } else {
-        console.error("Payment Creation Failed:", error);
-        toast.error("Payment Creation Failed. Please try again.");
-      }
-    }
+    //     const rzp1 = new window.Razorpay(options);
+    //     rzp1.on("payment.failed", function (response) {
+    //       alert(`Payment failed: ${response.error.description}`);
+    //     });
+    //     rzp1.open();
+    //   } else {
+    //     toast.error("Failed to create payment order");
+    //   }
+    // } catch (error) {
+    //   if (error.response && error.response.status === 404) {
+    //     toast.error("Cart is empty ");
+    //   } else {
+    //     console.error("Payment Creation Failed:", error);
+    //     toast.error("Payment Creation Failed. Please try again.");
+    //   }
+    // }
   };
   
 

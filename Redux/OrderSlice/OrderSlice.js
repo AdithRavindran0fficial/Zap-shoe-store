@@ -25,6 +25,25 @@ export const FetchingOrder = createAsyncThunk(
         
     }
 )
+export const GetOrderdetails = createAsyncThunk(
+    "OrderSlice/GetOrderdetails",
+    async(_)=>{
+        try{
+            const res = await axios.get("https://localhost:7211/api/Order/getOrder",{
+                headers:{
+                    Authorization:`Bearer ${localStorage.getItem("token")}`
+                }
+            })
+            if(res.status==200){
+                return res.data.data
+            }
+
+        }
+        catch(error){
+            console.log("Eror occured during fetching orders")
+        }
+    }
+)
 
 
 
@@ -115,6 +134,9 @@ const OrderSlice = createSlice({
         })
         .addCase(TotalSalesFetch.fulfilled,(state,action)=>{
             state.TotalSales = action.payload
+        })
+        .addCase(GetOrderdetails.fulfilled,(state,action)=>{
+            state.Orders  = action.payload
         })
     }
 

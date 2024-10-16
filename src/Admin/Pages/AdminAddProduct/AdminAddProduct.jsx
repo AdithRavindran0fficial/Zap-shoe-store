@@ -2,42 +2,61 @@ import { Field, Form, Formik, ErrorMessage } from "formik";
 import React from "react";
 import toast from "react-hot-toast";
 import * as yup from "yup";
-import api from "../../../../utils/axios";
 import { useDispatch } from "react-redux";
 import { Addproduct } from "../../../../Redux/productSlice/productSlice";
-import axios from "axios";
 
 const AdminAddProduct = () => {
   const dispatch = useDispatch();
 
   const validationSchema = yup.object({
-    Title: yup.string().required("This Field is Required"),
-    Description: yup.string().required("This Field is Required"),
-    Price: yup.number().required("This Field is Required"),
-    CategoryId: yup.number().required("This Field is Required").typeError("Category must be a number"),
-    Quantity: yup.number().required("This Field is Required").min(1, "Quantity must be at least 1"),
-    img: yup.mixed().required("An image file is required").test("fileType", "Only JPEG and PNG files are supported", (value) => {
-      return value && (value.type === "image/jpeg" || value.type === "image/png");
-    }),
+    title: yup.string().required("This Field is Required"),
+    description: yup.string().required("This Field is Required"),
+    price: yup.number().required("This Field is Required"),
+    category: yup
+      .number()
+      .required("This Field is Required")
+      .typeError("Category must be a number"),
+    quantity: yup
+      .number()
+      .required("This Field is Required")
+      .min(1, "Quantity must be at least 1"),
+    image: yup
+      .mixed()
+      .required("An image file is required")
+      .test(
+        "fileType",
+        "Only JPEG and PNG files are supported",
+        (value) => {
+          return (
+            value &&
+            (value.type === "image/jpeg" || value.type === "image/png")
+          );
+        }
+      ),
   });
 
   const handleSubmit = async (values) => {
-    console.log("Submitting form with values:", values);
-  
-    const formData = new FormData();
-    formData.append("Title", values.title); 
-    formData.append("Description", values.description);
-    formData.append("Price", values.price);
-    formData.append("CategoryId", parseInt(values.category, 10));
-    formData.append("Quantity", values.quantity);
-    if (values.image) {
-      formData.append("img", values.image);
-  }
-   
-       dispatch(Addproduct({formData}));
-      // toast.success("Product added successfully!"); 
+    try {
+      const formData = new FormData();
+      formData.append("Title", values.title);
+      formData.append("Description", values.description);
+      formData.append("Price", values.price);
+      formData.append("CategoryId", parseInt(values.category, 10));
+      formData.append("Quantity", values.quantity);
+      if (values.image) {
+        formData.append("img", values.image);
+      }
+
+      // Dispatch the thunk to add product
+       dispatch(Addproduct(formData));
+      
+      
+
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      toast.error("Failed to add product. Please try again.");
+    }
   };
-  
 
   return (
     <div>
@@ -50,9 +69,9 @@ const AdminAddProduct = () => {
           <Formik
             initialValues={{
               title: "",
-              description: "", // Initialize description
+              description: "",
               price: "",
-              category: "", // Keep as string for the form input
+              category: "",
               quantity: 1,
               image: null,
             }}
@@ -62,7 +81,7 @@ const AdminAddProduct = () => {
             {({ setFieldValue }) => (
               <Form className="overflow-y-auto sm:h-96 h-full mb-0 mt-6 space-y-4 rounded-lg p-4 shadow-lg sm:p-6 lg:p-8 sm:ms-20">
                 <p className="text-center text-lg font-medium">
-                  Add products to your cart
+                  Add products to your catalog
                 </p>
 
                 <div>
@@ -97,8 +116,8 @@ const AdminAddProduct = () => {
                   <div className="relative">
                     <Field
                       name="description"
-                      as="textarea" // Make it a textarea for better UX
-                      rows="4" // Set the number of rows
+                      as="textarea"
+                      rows="4"
                       className="w-full rounded-md mb-2 border-gray-200 p-3 text-sm shadow-sm border"
                       placeholder="Enter Description"
                     />
@@ -142,7 +161,7 @@ const AdminAddProduct = () => {
                   <div className="relative">
                     <Field
                       name="category"
-                      type="number" // Change to number input
+                      type="number"
                       className="w-full rounded-md mb-4 border-gray-200 p-3 pe-12 text-sm shadow-sm border"
                       placeholder="Enter Category"
                     />
@@ -202,8 +221,6 @@ const AdminAddProduct = () => {
                 <button
                   type="submit"
                   className="block w-full rounded-lg bg-indigo-600 px-5 py-3 text-sm font-medium text-white"
-                  
-                  
                 >
                   Add Product
                 </button>
